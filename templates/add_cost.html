@@ -10,6 +10,9 @@
     {{ form_new_cost.csrf_token }}
     <div class="form-check">
       <div class="">
+        <input type="datetime-local" name="insert_time" value="{{ time_now }}">
+      </div>
+      <div class="">
         {{ form_new_cost.item.label }} <br> {{ form_new_cost.item(rows=3) }} <br>
         {% for err in form_new_cost.item.errors %}
           <span style="color:red">{{ err }}</span>

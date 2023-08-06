@@ -18,10 +18,10 @@
 
     <title>Apportionment of expenses</title>
   </head>
-  <body>
+  <body class="body-color">
 
 
-    <header class="p-3 border-bottom sticky-top header-color">
+    <header class="border-bottom sticky-top header-color">
       <div class="container">
         <div class="cost-item-content">
           <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start ">
@@ -30,20 +30,20 @@
             </a>
 
             <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-              <li><a href="{{ url_for('home', tour_title=tour_title) }}" class="nav-link px-2 link-body-emphasis {% block link_home %}{% endblock %}">Home</a></li>
-              <li><a href="{{ url_for('summary', tour_title=tour_title) }}" class="nav-link px-2 link-body-emphasis {% block link_summary %}{% endblock %}">Summary</a></li>
+              <li><a href="{{ url_for('home', tour_title=tour_title) }}" class="header-link nav-link px-2 link-body-emphasis {% block link_home %}{% endblock %}">Home</a></li>
+              <li><a href="{{ url_for('summary', tour_title=tour_title) }}" class="header-link nav-link px-2 link-body-emphasis {% block link_summary %}{% endblock %}">Summary</a></li>
             </ul>
           </div>
 
 
           <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
             <div>
-              <a href="{{ url_for('check_tour_name') }}" class="nav-link px-2 link-body-emphasis text-end">My Tours</a>
+              <a href="{{ url_for('check_tour_name') }}" class="header-link nav-link px-2 link-body-emphasis text-end">My Tours</a>
             </div>
-            <div>
-              <button type="button" class="btn btn-outline-light me-2">Login</button>
-              <button type="button" class="btn btn-warning">Sign-up</button>
-            </div>
+<!--            <div>-->
+<!--              <button type="button" class="btn btn-outline-light me-2">Login</button>-->
+<!--              <button type="button" class="btn btn-warning">Sign-up</button>-->
+<!--            </div>-->
           </div>
         </div>
       </div>

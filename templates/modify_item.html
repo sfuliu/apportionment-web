@@ -8,6 +8,9 @@
     <div class="form-wrapper">
       {{ form_modify_cost.csrf_token }}
         <div class="form-check">
+          <div class="">
+            <input type="datetime-local" name="insert_time" value="{{ insert_time }}">
+          </div>
           <div  class="">
             {{ form_modify_cost.item.label }} <br> {{ form_modify_cost.item(rows=3) }}<br>
             {% for err in form_modify_cost.item.errors %}

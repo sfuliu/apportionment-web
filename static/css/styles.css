@@ -1,5 +1,8 @@
 
-element.style {
+.header-link {
+    font-size: 1.5rem;
+    font-family: serif;
+    font-weight: bold;
 }
 
 .disabled-link {
@@ -15,6 +18,11 @@ element.style {
 .header-color {
     background-color: white;
 }
+
+.body-color {
+    background-color: white;
+}
+
 
 .card-header:first-child {
     border-radius: var(--bs-card-inner-border-radius) var(--bs-card-inner-border-radius) 0 0;

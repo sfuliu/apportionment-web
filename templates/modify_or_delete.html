@@ -7,9 +7,19 @@
 <form action="{{ url_for('modify_or_delete', item_id=item_id) }}" method="post">
     <div class="form-wrapper">
         <div class="form-content">
-            {{ form_modify_cost.item.label }} <br> {{ form_modify_cost.item(rows=3, disabled="True") }}<br>
-            {{ form_modify_cost.who_pay.label }} <br> {{ form_modify_cost.who_pay(disabled="True") }}<br>
-            {{ form_modify_cost.money.label }} <br> {{ form_modify_cost.money(rows=3, disabled="True") }}<br>
+            <div class="">
+                <input type="datetime-local" name="insert_time" value="{{ insert_time }}" disabled>
+            </div>
+            <div class="">
+                {{ form_modify_cost.item.label }} <br> {{ form_modify_cost.item(rows=3, disabled="True") }}
+            </div>
+            <div class="">
+                {{ form_modify_cost.who_pay.label }} <br> {{ form_modify_cost.who_pay(disabled="True") }}
+            </div>
+            <div class="">
+                {{ form_modify_cost.money.label }} <br> {{ form_modify_cost.money(rows=3, disabled="True") }}
+            </div>
+
             <label>Apportion People</label> <br>
             {% for member in all_member %}
             {% if member in who_apportion %}

@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField, SelectMultipleField, FloatField
 from wtforms.validators import DataRequired, NumberRange
-import datetime
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
@@ -34,8 +34,8 @@ class Cost(db.Model):
     who_pay = db.Column(db.String(250), nullable=False)
     money = db.Column(db.Float, nullable=False)
     who_apportion = db.Column(db.String(250), nullable=False)
-    insert_time = db.Column(db.DateTime)
-    update_time = db.Column(db.DateTime)
+    insert_time = db.Column(db.String(25), nullable=False)
+    update_time = db.Column(db.String(25), nullable=False)
 
 
 
@@ -282,6 +282,8 @@ def add_num():
 @app.route('/add_cost', methods=['GET', 'POST'])
 def add_cost():
     tour_title = request.args.get('tour_title')
+    time_now = str(datetime.now().date()) + "T" + str(datetime.now().strftime("%H:%M"))
+    print(time_now)
     tour_base = db.session.execute(db.select(TourName).where(TourName.tour_title == tour_title)).scalar()
     member_num = tour_base.member_num
     members = eval(tour_base.all_member)
@@ -316,8 +318,10 @@ def add_cost():
                 er = 'At least choose one.'
                 print(er)
                 return render_template('add_cost.html', form_new_cost=new_cost, tour_title=tour_title,
-                                       all_member=members, member_num=member_num, er=er)
+                                       all_member=members, member_num=member_num, er=er, time_now=time_now)
             else:
+                insert_time = request.form.get("insert_time")
+                print(insert_time)
                 who_apportion = str(apportion)
                 new_cost = Cost(
                     tour_title = tour_title,
@@ -326,8 +330,8 @@ def add_cost():
                     who_pay = who_pay,
                     money = money,
                     who_apportion = who_apportion,
-                    insert_time = datetime.datetime.now(),
-                    update_time = datetime.datetime.now()
+                    insert_time = insert_time,
+                    update_time = insert_time
                 )
                 db.session.add(new_cost)
                 db.session.commit()
@@ -335,14 +339,15 @@ def add_cost():
 
     else:
 
-        return render_template('add_cost.html', form_new_cost=new_cost, tour_title=tour_title, all_member=members, member_num=member_num)
+        return render_template('add_cost.html', form_new_cost=new_cost, tour_title=tour_title, all_member=members, member_num=member_num, time_now=time_now)
 
 @app.route("/home", methods=['GET', 'POST'])
 def home():
     tour_title = request.args.get('tour_title')
     # tour_base = db.session.execute(db.select(TourName).where(TourName.tour_title == tour_title)).scalar()
     if tour_title:
-        tour_base = db.session.execute(db.select(Cost).order_by(Cost.insert_time)).scalars()
+        tour_base = db.session.execute(db.select(Cost).order_by(Cost.insert_time)).scalars().all()
+        tour_base.reverse()
         data_base = []
         for data in tour_base:
             if data.tour_title == tour_title:
@@ -399,6 +404,7 @@ def modify_or_delete():
     item_id = request.args.get('item_id')
     print(item_id)
     tour_base = db.session.execute(db.select(Cost).where(Cost.id == item_id)).scalar()
+    insert_time = tour_base.insert_time
     members = eval(tour_base.all_member)
     modify_cost = CostInput()
     print('777777777777777777777777')
@@ -421,7 +427,8 @@ def modify_or_delete():
         modify_cost.money.data = tour_base.money
         return render_template('modify_or_delete.html', item_id=item_id, tour_title=tour_base.tour_title,
                                form_modify_cost=modify_cost, all_member=members,
-                               member_num=len(eval(tour_base.all_member)), who_apportion=eval(tour_base.who_apportion))
+                               member_num=len(eval(tour_base.all_member)), who_apportion=eval(tour_base.who_apportion),
+                               insert_time=insert_time)
 
 
 @app.route('/modify_item', methods=['GET', 'POST'])
@@ -430,6 +437,7 @@ def modify_item():
     print(item_id)
     tour_base = db.session.execute(db.select(Cost).where(Cost.id == item_id)).scalar()
     tour_title = tour_base.tour_title
+
     members = eval(tour_base.all_member)
     member_num = len(members)
     all_member = [""]
@@ -461,21 +469,20 @@ def modify_item():
             tour_base.who_pay = modify_cost.who_pay.data
             tour_base.money = modify_cost.money.data
             tour_base.who_apportion = who_apportion
-            tour_base.update_time = datetime.datetime.now()
+            tour_base.insert_time = request.form.get("insert_time")
+            tour_base.update_time = str(datetime.now().date()) + "T" + str(datetime.now().strftime("%H:%M"))
             db.session.commit()
             return redirect(url_for('home', tour_title=tour_title))
 
     elif modify_cost.validate_on_submit() and apportion == []:
+        insert_time = tour_base.insert_time
         modify_cost.item.data = cost_item
         modify_cost.who_pay.data = who_pay
         modify_cost.money.data = money
         er = 'At least choose one.'
         print(er)
         return render_template('modify_item.html',item_id=item_id, form_modify_cost=modify_cost,
-                                       all_member=members, member_num=member_num, er=er)
-
-
-
+                                       all_member=members, member_num=member_num, er=er, insert_time=insert_time)
 
             # if apportion == []:
             #     modify_cost.item.data = cost_item
@@ -495,7 +502,6 @@ def modify_item():
             #     db.session.commit()
             #     return redirect(url_for('home', tour_title=tour_title))
 
-
     else:
         all_member = [""]
         for member in members:
@@ -504,7 +510,10 @@ def modify_item():
         modify_cost.who_pay.data = tour_base.who_pay
         modify_cost.item.data = tour_base.item
         modify_cost.money.data = tour_base.money
-        return render_template('modify_item.html', item_id=item_id, form_modify_cost=modify_cost, all_member=members, member_num=len(eval(tour_base.all_member)), who_apportion=eval(tour_base.who_apportion))
+        insert_time = tour_base.insert_time
+        return render_template('modify_item.html', item_id=item_id, form_modify_cost=modify_cost, all_member=members,
+                               member_num=len(eval(tour_base.all_member)), who_apportion=eval(tour_base.who_apportion),
+                               insert_time=insert_time)
 
 
 
