@@ -351,7 +351,7 @@ def home():
         data_base = []
         for data in tour_base:
             if data.tour_title == tour_title:
-                data_base.append((data.id, data.item, data.money, data.update_time))
+                data_base.append((data.id, data.item, data.money, data.insert_time))
         print(data_base)
         if request.method == "POST":
             print('111111111111111')
