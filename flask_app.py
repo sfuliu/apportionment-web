@@ -182,11 +182,11 @@ def check_tour_name():
         # 沒有在database裡
         else:
             print("Create new")
-            new_title = TourName(
-                tour_title = tour_title
-            )
-            db.session.add(new_title)
-            db.session.commit()
+            # new_title = TourName(
+            #     tour_title = tour_title
+            # )
+            # db.session.add(new_title)
+            # db.session.commit()
             return redirect(url_for('add_num', input_member=True, tour_title=tour_title))
     return render_template("check_tour_name.html", all_title=all_title)
 
@@ -223,10 +223,19 @@ def add_num():
                 print(request.args.get('tour_title'))
                 if db.session.execute(db.select(TourName).where(TourName.tour_title == request.args.get('tour_title'))).scalar():
                     print("ESHFSHJSHGMSHM")
-                member_update = db.session.execute(db.select(TourName).where(TourName.tour_title == request.args.get('tour_title'))).scalar()
-                member_update.all_member = members
-                member_update.member_num = member_num
+
+                new_title = TourName(
+                    tour_title=tour_title,
+                    all_member = members,
+                    member_num = member_num
+                )
+                db.session.add(new_title)
                 db.session.commit()
+
+                # member_update = db.session.execute(db.select(TourName).where(TourName.tour_title == request.args.get('tour_title'))).scalar()
+                # member_update.all_member = members
+                # member_update.member_num = member_num
+                # db.session.commit()
                 print(members)
             # else:
             #     tour_title = request.args.get('tour_title')
@@ -358,8 +367,11 @@ def home():
 def summary():
     tour_title = request.args.get('tour_title')
     if tour_title:
-        results = Calculator(tour_title).summary()
-        return render_template('summary.html', tour_title=tour_title, results=results)
+        if db.session.execute(db.select(Cost).where(Cost.tour_title == tour_title)).scalar():
+            results = Calculator(tour_title).summary()
+            return render_template('summary.html', tour_title=tour_title, results=results)
+        else:
+            return render_template('summary.html', tour_title=tour_title, results=["For now, no cost in record."])
     else:
         return redirect(url_for('check_tour_name'))
 

@@ -25,13 +25,13 @@
       <div class="container">
         <div class="cost-item-content">
           <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start ">
-            <a href="{{ url_for('home', tour_title=tour_title) }}" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
+            <a href="{{ url_for('home', tour_title=tour_title) }}" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none {% block link_icon %}{% endblock %}">
               <img src="{{ url_for('static', filename='images/coin.png') }}" width="60">
             </a>
 
             <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-              <li><a href="{{ url_for('home', tour_title=tour_title) }}" class="nav-link px-2 link-body-emphasis">Home</a></li>
-              <li><a href="{{ url_for('summary', tour_title=tour_title) }}" class="nav-link px-2 link-body-emphasis">Summary</a></li>
+              <li><a href="{{ url_for('home', tour_title=tour_title) }}" class="nav-link px-2 link-body-emphasis {% block link_home %}{% endblock %}">Home</a></li>
+              <li><a href="{{ url_for('summary', tour_title=tour_title) }}" class="nav-link px-2 link-body-emphasis {% block link_summary %}{% endblock %}">Summary</a></li>
             </ul>
           </div>
 

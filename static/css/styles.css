@@ -2,6 +2,10 @@
 element.style {
 }
 
+.disabled-link {
+  pointer-events: none;
+}
+
 .flex-container {
     display: flex;
     justify-content: center;
