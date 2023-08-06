@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% from 'bootstrap5/form.html' import render_form %}
+
+
+{% block content_title %}Summary{% endblock %}
+{% block content %}
+
+<div class="form-wrapper">
+    <div class="text-center">
+        <div>
+            {% for result in results %}
+            <h5>{{ result }}</h5>
+            {% endfor %}
+        </div>
+
+        <div class="confirm-btn">
+            <a href="{{ url_for('home', tour_title=tour_title) }}" class="btn btn-primary">Back</a>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

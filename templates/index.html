@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% from 'bootstrap5/form.html' import render_form %}
+
+
+{% block content_title %}Apportion Cost System{% endblock %}
+
+
+{% block content %}
+
+<div>
+    {% for data in data_base %}
+        <a class="cost-item-wrapper" href="{{ url_for('modify_or_delete', item_id=data[0]) }}">
+            <div class="cost-item">
+                <div class="row g-0 text-left">
+                    <div class="cost-item-ts">
+                        <div>{{ data[3] }}</div>
+                    </div>
+                    <div class="cost-item-content">
+                        <h3>{{ data[1] }}</h3>
+                        <h3>$ {{ data[2] }}</h3>
+                    </div>
+                </div>
+            </div>
+        </a>
+    {% endfor %}
+</div>
+
+<div class="add-btn">
+    <a href="{{ url_for('add_cost', tour_title=tour_title) }}"><img src="{{ url_for('static', filename='images/plus-circle.svg') }}" width="80"></a>
+</div>
+{% endblock %}

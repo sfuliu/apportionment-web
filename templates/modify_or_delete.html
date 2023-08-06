@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% from 'bootstrap5/form.html' import render_form %}
+
+{% block content_title %}Cost Item{% endblock %}
+{% block content %}
+
+<form action="{{ url_for('modify_or_delete', item_id=item_id) }}" method="post">
+    <div class="form-wrapper">
+        <div class="form-content">
+            {{ form_modify_cost.item.label }} <br> {{ form_modify_cost.item(rows=3, disabled="True") }}<br>
+            {{ form_modify_cost.who_pay.label }} <br> {{ form_modify_cost.who_pay(disabled="True") }}<br>
+            {{ form_modify_cost.money.label }} <br> {{ form_modify_cost.money(rows=3, disabled="True") }}<br>
+            <label>Apportion People</label> <br>
+            {% for member in all_member %}
+            {% if member in who_apportion %}
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="{{ member }}" value="{{ member }}" id="{{ member }}_checked" checked disabled>
+                <label class="form-check-label" for="{{ member }}_checked">
+                {{ member }}
+                </label>
+            </div>
+
+            {% else %}
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="{{ member }}" value="{{ member }}" id="{{ member }}" disabled>
+                <label class="form-check-label" for="{{ member }}">
+                {{ member }}
+                </label>
+            </div>
+            {% endif %}
+            {% endfor %}
+            <div class="text-center confirm-btn">
+                <input name="cost_item_modify" type="submit" value="Modify" class="btn btn-outline-primary">
+                <input type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteItem" value="Delete">
+            </div>
+        </div>
+    </div>
+    <!--<a href="#" type="button" data-bs-toggle="modal" data-bs-target="#deleteItem">Delete</a>-->
+    <!-- 跳出視窗內容 -->
+    <div class="modal fade" id="deleteItem" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+        <!--  Header  -->
+                <div class="modal-header">
+                    <h2>{{ form_modify_cost.item.data }}  $ {{ form_modify_cost.money.data }}</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+        <!-- Body -->
+                <div class="modal-body">
+                    <p>Do you want to delete this item?</p>
+                </div>
+        <!-- Footer -->
+                <div class="modal-footer">
+                    <button name="cost_item_delete" class="btn btn-danger" type="submit" value="Delete">Delete</button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+
+{% endblock %}

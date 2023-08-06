@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% from 'bootstrap5/form.html' import render_form %}
+
+{% block content_title %}Total Member{% endblock %}
+{% block content %}
+
+<div class="form-wrapper">
+    {% if input_member_num: %}
+    <form action="{{ url_for('add_num') }}" method="get" class="text-center">
+        <h5>How many people:</h5>
+        <input name="member_num" type="number" class="form-control">
+        <input name="tour_title" hidden="hidden" value="{{ tour_title }}">
+        <input name="input_member" hidden="hidden" value="True">
+        <div class="confirm-btn">
+            <input name="member_num_submit" class="btn btn-outline-primary btn-lg w-30" type="submit" value="OK">
+        </div>
+    </form>
+    {% elif input_member: %}
+    <form action="{{ url_for('add_num') }}" method="get">
+
+        {% for i in range( member_num ) %}
+            <label>Member {{ i + 1 }} :</label>
+            <input name="member_{{ i + 1 }}" type="text" class="form-control">
+        {% endfor %}
+        <input name="input_member" hidden="hidden" value="False">
+        <input name="member_num" hidden="hidden" value="{{ member_num }}">
+        <input name="tour_title" hidden="hidden" value="{{ tour_title }}">
+        <div class="text-center confirm-btn">
+            <input name="member_submit" class="btn btn-primary" type="submit" value="GO">
+        </div>
+    </form>
+    {% endif %}
+</div>
+
+{% endblock %}

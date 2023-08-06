@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% from 'bootstrap5/form.html' import render_form %}
+
+{% block content_title %}Cost Item{% endblock %}
+{% block content %}
+
+<form action="{{ url_for('modify_item', item_id=item_id) }}" method="post" novalidate>
+    <div class="form-wrapper">
+      {{ form_modify_cost.csrf_token }}
+        <div class="form-check">
+          <div  class="">
+            {{ form_modify_cost.item.label }} <br> {{ form_modify_cost.item(rows=3) }}<br>
+            {% for err in form_modify_cost.item.errors %}
+              <span style="color:red">{{ err }}</span>
+            {% endfor %}
+          </div>
+          <div class="">
+            {{ form_modify_cost.who_pay.label }} <br> {{ form_modify_cost.who_pay }}<br>
+            {% for err in form_modify_cost.who_pay.errors %}
+              <span style="color:red">{{ err }}</span>
+            {% endfor %}
+          </div>
+          <div class="">
+            {{ form_modify_cost.money.label }} <br> {{ form_modify_cost.money(rows=3) }}<br>
+            {% for err in form_modify_cost.money.errors %}
+              <span style="color:red">{{ err }}</span>
+            {% endfor %}
+          </div>
+          <div class="">
+            <label>Apportion People</label>
+            {% for member in all_member %}
+              <div class="form-check">
+                {% if member in who_apportion %}
+                  <input class="form-check-input" type="checkbox" name="{{ member }}" value="{{ member }}" id="{{ member }}_checked" checked>
+                  <label class="form-check-label" for="{{ member }}_checked">
+                    {{ member }}
+                  </label>
+                {% else %}
+                  <input class="form-check-input" type="checkbox" name="{{ member }}" value="{{ member }}" id="{{ member }}">
+                  <label class="form-check-label" for="{{ member }}">
+                    {{ member }}
+                  </label>
+                {% endif %}
+              </div>
+            {% endfor %}
+            {% if er %}
+              <span style="color:red">{{ er }}</span>
+            {% endif %}
+          </div>
+          <div class="text-center confirm-btn">
+            <input name="cost_item_modify" class="btn btn-lg w-30 btn-outline-primary" type="submit" value="Update">
+          </div>
+        </div>
+    </div>
+</form>
+
+{% endblock %}

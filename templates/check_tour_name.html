@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% from 'bootstrap5/form.html' import render_form %}
+
+
+{% block content_title %}Apportionment Title{% endblock %}
+{% block content %}
+<div class="form-wrapper">
+  <div class="text-center">
+    <p>Please key in your tour title.</p>
+    <form action="{{ url_for('check_tour_name') }}" method="get">
+      <input list="browsers" name="tour_title" type="text" class="form-control">
+      <datalist id="browsers">
+        {% for title in all_title %}
+        <option value="{{ title }}">
+        {% endfor %}
+      </datalist>
+      <div class="confirm-btn">
+        <input name="tour_name_submit" type="submit" value="OK" class="w-30 btn btn-lg btn-outline-primary">
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
