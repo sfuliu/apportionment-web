@@ -102,7 +102,7 @@ class Calculator:
         if max(self.result.values()) == min(self.result.values()) == 0:
             expense = sum([cost.money for cost in self.tour_base])
             print(f"Your total cost is {expense}")
-            final_result.append(f"Your total cost is {expense}")
+            final_result.append(f"Your total cost is {round(expense, 1)}")
         else:
             # 如果結果不是不用給錢就一直重複計算
             while (max(self.result.values()) > 0) and (max(self.result.values()) != min(self.result.values())):
@@ -113,8 +113,8 @@ class Calculator:
                     if len([value for value in self.result.values() if value > 0]) == 1:
                         for (man, value) in self.result.items():
                             if value < 0:
-                                print(f"{man} give {max_man} $ {-value}")
-                                final_result.append(f"{man} give {max_man} $ {-value}")
+                                print(f"{man} give {max_man} $ {round(-value, 1)}")
+                                final_result.append(f"{man} give {max_man} $ {round(-value, 1)}")
                         break
                     else:
                         self.result[max_man] = max(self.result.values()) + min(self.result.values())
@@ -127,7 +127,7 @@ class Calculator:
                         #                 self.result[min_man] = 0
                 elif (max(self.result.values()) + min(self.result.values())) == 0:
                     print(f"{min_man} give {max_man} $ {max(self.result.values())}")
-                    final_result.append(f"{min_man} give {max_man} $ {max(self.result.values())}")
+                    final_result.append(f"{min_man} give {max_man} $ {round(max(self.result.values()), 1)}")
                     break
                 elif (max(self.result.values()) + min(self.result.values())) < 0:
                     # self.result[max_man] = 0
@@ -144,7 +144,7 @@ class Calculator:
                         for (man, value) in self.result.items():
                             if value > 0:
                                 print(f"{min_man} give {man} $ {value}")
-                                final_result.append(f"{min_man} give {man} $ {value}")
+                                final_result.append(f"{min_man} give {man} $ {round(value, 1)}")
                         break
                     else:
                         print("problem_1")
@@ -174,6 +174,11 @@ def check_tour_name():
             all_member = tour_base.all_member
             print(all_member)
             return redirect(url_for('home', tour_title=tour_title))
+        # 沒輸入任何字
+        elif len(tour_title) == 0:
+            er = 'Must input title.'
+            print(er)
+            return render_template("check_tour_name.html", all_title=all_title, er=er)
         # 沒有在database裡
         else:
             print("Create new")
@@ -183,12 +188,11 @@ def check_tour_name():
             db.session.add(new_title)
             db.session.commit()
             return redirect(url_for('add_num', input_member=True, tour_title=tour_title))
-
     return render_template("check_tour_name.html", all_title=all_title)
 
 @app.route('/num')
 def add_num():
-
+    tour_title = request.args.get('tour_title')
     # 有member資料
     if request.args.get('input_member') == "False":
         if request.args.get('member_submit') == "GO":
@@ -204,22 +208,33 @@ def add_num():
             print(member_num)
             for i in range(member_num):
                 all_member.append(request.args.get(f"member_{i + 1}"))
-            members = str(all_member)
-            print(request.args.get('tour_title'))
-            if db.session.execute(db.select(TourName).where(TourName.tour_title == request.args.get('tour_title'))).scalar():
-                print("ESHFSHJSHGMSHM")
-            member_update = db.session.execute(db.select(TourName).where(TourName.tour_title == request.args.get('tour_title'))).scalar()
-            member_update.all_member = members
-            member_update.member_num = member_num
-            db.session.commit()
-            print(members)
-        # else:
-        #     tour_title = request.args.get('tour_title')
-        #     print(tour_title)
-        #     print("GGGGGGGGGGGGGGGGG")
-        #     members = db.session.execute(db.select(TourName).where(TourName.title == tour_title)).scalar().all_member
-        #     print(members)
-        return redirect(url_for('home', tour_title=request.args.get('tour_title')))
+
+            if "" in all_member:
+                empt_index = []
+                for i in range(len(all_member)):
+                    if all_member[i] == "":
+                        empt_index.append(i)
+                er = 'Must input name.'
+                print(er)
+                return render_template('member_num.html', input_member=True, member_num=member_num, tour_title=tour_title, all_member=all_member, empt_index=empt_index, er=er)
+
+            else:
+                members = str(all_member)
+                print(request.args.get('tour_title'))
+                if db.session.execute(db.select(TourName).where(TourName.tour_title == request.args.get('tour_title'))).scalar():
+                    print("ESHFSHJSHGMSHM")
+                member_update = db.session.execute(db.select(TourName).where(TourName.tour_title == request.args.get('tour_title'))).scalar()
+                member_update.all_member = members
+                member_update.member_num = member_num
+                db.session.commit()
+                print(members)
+            # else:
+            #     tour_title = request.args.get('tour_title')
+            #     print(tour_title)
+            #     print("GGGGGGGGGGGGGGGGG")
+            #     members = db.session.execute(db.select(TourName).where(TourName.title == tour_title)).scalar().all_member
+            #     print(members)
+        return redirect(url_for('home', tour_title=tour_title))
     #     input_cost = CostInput()
     #     input_cost.who_pay.choices = []
     #     return render_template('member_num.html', form_cost=input_cost)
@@ -231,8 +246,17 @@ def add_num():
             print(request.args.get('member_num_submit'))
             if request.args.get('member_num_submit') == "OK" and request.args.get('member_submit') == None:
                 print("YYYYYYYYYYYYY")
-                member_num = int(request.args.get('member_num'))
-                return render_template('member_num.html', input_member=True, member_num=member_num, tour_title=request.args.get('tour_title'))
+                member_num = request.args.get('member_num')
+                if len(member_num) == 0:
+                    er = 'Must input number.'
+                    print(er)
+                    return render_template('member_num.html', input_member_num=True, tour_title=tour_title, er=er)
+                elif type(eval(member_num)) is not int:
+                    er = 'Must input an integer.'
+                    print(er)
+                    return render_template('member_num.html', input_member_num=True, tour_title=tour_title, er=er)
+                else:
+                    return render_template('member_num.html', input_member=True, member_num=int(member_num), tour_title=tour_title)
 
 
 
@@ -241,10 +265,10 @@ def add_num():
         else:
             print("IIIIIIIIIIIIIIIIII")
 
-        return render_template('member_num.html', input_member_num=True, tour_title=request.args.get('tour_title'))
+        return render_template('member_num.html', input_member_num=True, tour_title=tour_title)
     else:
         print("XXXXXXXXXXXXXXXXXX")
-    return render_template('member_num.html', tour_title=request.args.get('tour_title'))
+    return render_template('member_num.html', tour_title=tour_title)
 
 @app.route('/add_cost', methods=['GET', 'POST'])
 def add_cost():

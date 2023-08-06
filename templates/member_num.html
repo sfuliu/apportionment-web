@@ -6,9 +6,12 @@
 
 <div class="form-wrapper">
     {% if input_member_num: %}
-    <form action="{{ url_for('add_num') }}" method="get" class="text-center">
+    <form action="{{ url_for('add_num') }}" method="get" class="text-center" novalidate>
         <h5>How many people:</h5>
         <input name="member_num" type="number" class="form-control">
+        {% if er %}
+          <span style="color:red">{{ er }}</span>
+        {% endif %}
         <input name="tour_title" hidden="hidden" value="{{ tour_title }}">
         <input name="input_member" hidden="hidden" value="True">
         <div class="confirm-btn">
@@ -16,12 +19,28 @@
         </div>
     </form>
     {% elif input_member: %}
-    <form action="{{ url_for('add_num') }}" method="get">
+    <form action="{{ url_for('add_num') }}" method="get" novalidate>
 
         {% for i in range( member_num ) %}
-            <label>Member {{ i + 1 }} :</label>
-            <input name="member_{{ i + 1 }}" type="text" class="form-control">
+            <div>
+                {% if er %}
+                    {% if i in empt_index %}
+                        <label>Member {{ i + 1 }} :</label>
+                        <input name="member_{{ i + 1 }}" type="text" class="form-control">
+                        <span style="color:red">{{ er }}</span>
+                    {% else %}
+                        <label>Member {{ i + 1 }} :</label>
+                        <input name="member_{{ i + 1 }}" type="text" class="form-control" value="{{ all_member[i] }}">
+
+                    {% endif %}
+                {% else %}
+                    <label>Member {{ i + 1 }} :</label>
+                    <input name="member_{{ i + 1 }}" type="text" class="form-control">
+                {% endif %}
+
+            </div>
         {% endfor %}
+
         <input name="input_member" hidden="hidden" value="False">
         <input name="member_num" hidden="hidden" value="{{ member_num }}">
         <input name="tour_title" hidden="hidden" value="{{ tour_title }}">
