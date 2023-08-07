@@ -5,6 +5,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField, SelectMultipleField, FloatField
 from wtforms.validators import DataRequired, NumberRange
 from datetime import datetime
+import math
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
@@ -98,60 +99,63 @@ class Calculator:
 
     def summary(self):
         final_result = []
-        # 重頭到尾只有一個人，類似自己記帳
-        if max(self.result.values()) == min(self.result.values()) == 0:
-            expense = sum([cost.money for cost in self.tour_base])
-            print(f"Your total cost is {expense}")
-            final_result.append(f"Your total cost is {round(expense, 1)}")
-        else:
-            # 如果結果不是不用給錢就一直重複計算
-            while (max(self.result.values()) > 0) and (max(self.result.values()) != min(self.result.values())):
-                max_man = [man for (man, value) in self.result.items() if value == max(self.result.values())][0]
-                min_man = [man for (man, value) in self.result.items() if value == min(self.result.values())][0]
-                if (max(self.result.values()) + min(self.result.values())) > 0:
-                    # result 裡只剩一個 value > 0 時，結束分帳
-                    if len([value for value in self.result.values() if value > 0]) == 1:
-                        for (man, value) in self.result.items():
-                            if value < 0:
-                                print(f"{man} give {max_man} $ {round(-value, 1)}")
-                                final_result.append(f"{man} give {max_man} $ {round(-value, 1)}")
-                        break
-                    else:
-                        self.result[max_man] = max(self.result.values()) + min(self.result.values())
-                        self.result[min_man] = 0
-                        # for (max_man, max_result) in self.result.items():
-                        #     for (min_man, min_result) in self.result.items():
-                        #         if self.result[max_man] == max(self.result.values()):
-                        #             if self.result[min_man] == min(self.result.values()):
-                        #                 self.result[max_man] = max(self.result.values()) + min(self.result.values())
-                        #                 self.result[min_man] = 0
-                elif (max(self.result.values()) + min(self.result.values())) == 0:
-                    print(f"{min_man} give {max_man} $ {max(self.result.values())}")
-                    final_result.append(f"{min_man} give {max_man} $ {round(max(self.result.values()), 1)}")
-                    break
-                elif (max(self.result.values()) + min(self.result.values())) < 0:
-                    # self.result[max_man] = 0
-                    # self.result[min_man] = max(self.result.values()) + min(self.result.values())
-                    # for (max_man, max_result) in self.result.items():
-                    #     for (min_man, min_result) in self.result.items():
-                    #         if self.result[max_man] == max(self.result.values()):
-                    #             if self.result[min_man] == min(self.result.values()):
-                    #                 self.result[max_man] = 0
-                    #                 self.result[min_man] = max(self.result.values()) + min(self.result.values())
+        temporary_result = {}
+        for (man, value) in self.result.items():
+            temporary_result[man] = {}
+        print(temporary_result)
 
-                    # result 裡只剩一個 value < 0 時，結束分帳
-                    if len([value for value in self.result.values() if value < 0]) == 1:
-                        for (man, value) in self.result.items():
-                            if value > 0:
-                                print(f"{min_man} give {man} $ {value}")
-                                final_result.append(f"{min_man} give {man} $ {round(value, 1)}")
-                        break
-                    else:
-                        print("problem_1")
+        while True:
+            max_man = [man for (man, value) in self.result.items() if value == max(self.result.values())][0]
+            min_man = [man for (man, value) in self.result.items() if value == min(self.result.values())][0]
+            max_value = [value for (man, value) in self.result.items() if value == max(self.result.values())][0]
+            min_value = [value for (man, value) in self.result.items() if value == min(self.result.values())][0]
+            print(f"{min_man}  {min_value}")
+            print(f"{max_man}  {max_value}")
+            # 重頭到尾只有一個人，類似自己記帳
+            if max_value == min_value == 0:
+                expense = sum([cost.money for cost in self.tour_base])
+                print(f"Your total cost is {expense}")
+                temporary_result[min_man][max_man] = round(expense, 2)
+                final_result.append(f"Your total cost is {round(expense, 2)}")
+                break
+            # 分帳完成(加判斷round是因為float計算誤差會導致錯誤)
+            elif max_value + min_value == 0 or round(round(max_value + min_value, 4), 3) == 0:
+                temporary_result[min_man][max_man] = round(-min_value, 2)
+                final_result.append(f"{min_man} give {max_man} $ {round(-min_value, 2)}")
+                break
+            # 繼續分帳
+            elif max_value != min_value:
+                # 收到一個人還的錢後，還不夠要繼續收
+                if max_value + min_value > 0:
+                    temporary_result[min_man][max_man] = round(-min_value, 2)
+                    print(f"{min_man} give {max_man} $ {round(-min_value, 2)}")
+                    final_result.append(f"{min_man} give {max_man} $ {round(-min_value, 2)}")
+                    self.result[max_man] = max_value + min_value
+                    self.result[min_man] = 0
+                    print("t_1")
+                    print(f"{min_man}  {self.result[min_man]}")
+                    print(f"{max_man}  {self.result[max_man]}")
+
+                # 還一個人的錢後，還有欠別人的
+                elif max_value + min_value < 0:
+                    temporary_result[min_man][max_man] = round(max_value, 2)
+                    print(temporary_result)
+                    print(f"{min_man} give {max_man} $ {round(max_value, 2)}")
+                    final_result.append(f"{min_man} give {max_man} $ {round(max_value, 2)}")
+                    self.result[max_man] = 0
+                    self.result[min_man] = max_value + min_value
+
+                    print(f"{min_man}  {self.result[min_man]}")
+                    print(f"{max_man}  {self.result[max_man]}")
+                    print("t_2")
+
                 else:
-                    print("?!?!!?!??!?!?!?!?!?!")
+                    print("!!!!!!!!!!!!!!!!!!!!")
                     break
-        return final_result
+            else:
+                print("????????????????????")
+        print(temporary_result)
+        return temporary_result
 
 
 @app.route('/')
@@ -373,8 +377,17 @@ def summary():
     tour_title = request.args.get('tour_title')
     if tour_title:
         if db.session.execute(db.select(Cost).where(Cost.tour_title == tour_title)).scalar():
+            all_member = eval(db.session.execute(db.select(Cost).where(Cost.tour_title == tour_title)).scalar().all_member)
             results = Calculator(tour_title).summary()
-            return render_template('summary.html', tour_title=tour_title, results=results)
+            final_result = []
+            for member1 in all_member:
+                for member2 in all_member:
+                    if member2 in results[member1].keys():
+                        if member1 == member2:
+                            final_result.append(f"Your total cost is $ {results[member1][member2]}")
+                        else:
+                            final_result.append(f"{member1} give {member2} $ {results[member1][member2]}")
+            return render_template('summary.html', tour_title=tour_title, results=final_result)
         else:
             return render_template('summary.html', tour_title=tour_title, results=["For now, no cost in record."])
     else:
