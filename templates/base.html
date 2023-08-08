@@ -30,8 +30,8 @@
             </a>
 
             <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-              <li><a href="{{ url_for('home', tour_title=tour_title) }}" class="header-link nav-link px-2 link-body-emphasis {% block link_home %}{% endblock %}">Home</a></li>
-              <li><a href="{{ url_for('summary', tour_title=tour_title) }}" class="header-link nav-link px-2 link-body-emphasis {% block link_summary %}{% endblock %}">Summary</a></li>
+              <li><a href="{{ url_for('home', tour_title=tour_title) }}" {% block link_home %}{% endblock %} class="header-link nav-link px-2 link-body-emphasis">Home</a></li>
+              <li><a href="{{ url_for('summary', tour_title=tour_title) }}" {% block link_summary %}{% endblock %} class="header-link nav-link px-2 link-body-emphasis">Summary</a></li>
             </ul>
           </div>
 
@@ -51,28 +51,24 @@
 
 
 
+    <div class="container py-3">
+      <div class="row row-cols-1 row-cols-md-1 mb-3">
+            <div class="col">
+              <div class="card mb-4 rounded-3 shadow-sm">
+                <div class="card-header py-3">
 
+                  <h2 class="my-0 fw-normal card-header-h2">{% block content_title %}{% endblock %}</h2>
 
+                </div>
+                <div class="card-body">
 
+                  {% block content %}{% endblock %}
 
-      <div class="container py-3">
-        <div class="row row-cols-1 row-cols-md-1 mb-3">
-              <div class="col">
-                <div class="card mb-4 rounded-3 shadow-sm">
-                  <div class="card-header py-3">
-
-                    <h2 class="my-0 fw-normal card-header-h2">{% block content_title %}{% endblock %}</h2>
-
-                  </div>
-                  <div class="card-body">
-
-                    {% block content %}{% endblock %}
-
-                  </div>
                 </div>
               </div>
-        </div>
+            </div>
       </div>
+    </div>
 
 
     <div class="container">
@@ -80,6 +76,7 @@
         <p class="text-center text-body-secondary">© 2023 Billy Liu</p>
       </footer>
     </div>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+    <a href="#" class="top">Top</a>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
   </body>
 </html>

@@ -2,10 +2,10 @@ from flask import Flask, render_template, redirect, url_for, request
 from flask_bootstrap import Bootstrap5
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, SelectField, SelectMultipleField, FloatField
+from wtforms import StringField, SubmitField, SelectField, FloatField
 from wtforms.validators import DataRequired, NumberRange
 from datetime import datetime
-import math
+import pytz
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
@@ -53,9 +53,6 @@ class CostInput(FlaskForm):
     item = StringField("Cost Item", validators=[DataRequired()])
     who_pay = SelectField("Who Pay", validators=[DataRequired()])
     money = FloatField("Money", validators=[DataRequired(), NumberRange(min=0,message='Must over 0.')])
-    # who_apportion = SelectMultipleField("Apportion People", validators=[DataRequired()])
-    # submit = SubmitField("Add")
-
 
 class Calculator:
     def __init__(self, tour_title):
@@ -154,6 +151,7 @@ class Calculator:
                     break
             else:
                 print("????????????????????")
+                break
         print(temporary_result)
         return temporary_result
 
@@ -164,8 +162,7 @@ def check_tour_name():
     print(all_title)
     input_title = request.args.get('tour_name_submit')
     print(input_title)
-    # input_title = TitleInput()
-    # if input_title.validate_on_submit():
+
     if input_title == "OK":
         # 檢查tour_name是否在table裡
         tour_title = request.args.get('tour_title')
@@ -220,13 +217,12 @@ def add_num():
                         empt_index.append(i)
                 er = 'Must input name.'
                 print(er)
-                return render_template('member_num.html', input_member=True, member_num=member_num, tour_title=tour_title, all_member=all_member, empt_index=empt_index, er=er)
+                return render_template('member_num.html', input_member=True, member_num=member_num,
+                                       tour_title=tour_title, all_member=all_member, empt_index=empt_index, er=er)
 
             else:
                 members = str(all_member)
                 print(request.args.get('tour_title'))
-                if db.session.execute(db.select(TourName).where(TourName.tour_title == request.args.get('tour_title'))).scalar():
-                    print("ESHFSHJSHGMSHM")
 
                 new_title = TourName(
                     tour_title=tour_title,
@@ -236,7 +232,8 @@ def add_num():
                 db.session.add(new_title)
                 db.session.commit()
 
-                # member_update = db.session.execute(db.select(TourName).where(TourName.tour_title == request.args.get('tour_title'))).scalar()
+                # member_update = db.session.execute(db.select(TourName).where(TourName.tour_title ==
+                #                                                              request.args.get('tour_title'))).scalar()
                 # member_update.all_member = members
                 # member_update.member_num = member_num
                 # db.session.commit()
@@ -245,7 +242,8 @@ def add_num():
             #     tour_title = request.args.get('tour_title')
             #     print(tour_title)
             #     print("GGGGGGGGGGGGGGGGG")
-            #     members = db.session.execute(db.select(TourName).where(TourName.title == tour_title)).scalar().all_member
+            #     members = db.session.execute(db.select(TourName).where(TourName.title ==
+            #                                                            tour_title)).scalar().all_member
             #     print(members)
         return redirect(url_for('home', tour_title=tour_title))
     #     input_cost = CostInput()
@@ -269,9 +267,8 @@ def add_num():
                     print(er)
                     return render_template('member_num.html', input_member_num=True, tour_title=tour_title, er=er)
                 else:
-                    return render_template('member_num.html', input_member=True, member_num=int(member_num), tour_title=tour_title)
-
-
+                    return render_template('member_num.html', input_member=True, member_num=int(member_num),
+                                           tour_title=tour_title)
 
             else:
                 print("UUUUUUUUUUUUUUU")
@@ -286,7 +283,8 @@ def add_num():
 @app.route('/add_cost', methods=['GET', 'POST'])
 def add_cost():
     tour_title = request.args.get('tour_title')
-    time_now = str(datetime.now().date()) + "T" + str(datetime.now().strftime("%H:%M"))
+    timezone_tw = pytz.timezone('ROC')
+    time_now = str(datetime.now(timezone_tw).date()) + "T" + str(datetime.now(timezone_tw).strftime("%H:%M"))
     print(time_now)
     tour_base = db.session.execute(db.select(TourName).where(TourName.tour_title == tour_title)).scalar()
     member_num = tour_base.member_num
@@ -343,12 +341,12 @@ def add_cost():
 
     else:
 
-        return render_template('add_cost.html', form_new_cost=new_cost, tour_title=tour_title, all_member=members, member_num=member_num, time_now=time_now)
+        return render_template('add_cost.html', form_new_cost=new_cost, tour_title=tour_title, all_member=members,
+                               member_num=member_num, time_now=time_now)
 
 @app.route("/home", methods=['GET', 'POST'])
 def home():
     tour_title = request.args.get('tour_title')
-    # tour_base = db.session.execute(db.select(TourName).where(TourName.tour_title == tour_title)).scalar()
     if tour_title:
         tour_base = db.session.execute(db.select(Cost).order_by(Cost.insert_time)).scalars().all()
         tour_base.reverse()
@@ -377,7 +375,8 @@ def summary():
     tour_title = request.args.get('tour_title')
     if tour_title:
         if db.session.execute(db.select(Cost).where(Cost.tour_title == tour_title)).scalar():
-            all_member = eval(db.session.execute(db.select(Cost).where(Cost.tour_title == tour_title)).scalar().all_member)
+            all_member = eval(db.session.execute(db.select(Cost).where(Cost.tour_title ==
+                                                                       tour_title)).scalar().all_member)
             results = Calculator(tour_title).summary()
             final_result = []
             for member1 in all_member:
@@ -494,26 +493,8 @@ def modify_item():
         modify_cost.money.data = money
         er = 'At least choose one.'
         print(er)
-        return render_template('modify_item.html',item_id=item_id, form_modify_cost=modify_cost,
+        return render_template('modify_item.html',item_id=item_id, tour_title=tour_title, form_modify_cost=modify_cost,
                                        all_member=members, member_num=member_num, er=er, insert_time=insert_time)
-
-            # if apportion == []:
-            #     modify_cost.item.data = cost_item
-            #     modify_cost.who_pay.data = who_pay
-            #     modify_cost.money.data = money
-            #     er = 'Invalid Choice! At least choose one persion.'
-            #     print(er)
-            #     return render_template('modify_item.html', form_modify_cost=modify_cost, tour_title=tour_title,
-            #                            all_member=members, member_num=member_num, er=er)
-            # else:
-            #     who_apportion = str(apportion)
-            #     tour_base.item = modify_cost.item.data
-            #     tour_base.who_pay = modify_cost.who_pay.data
-            #     tour_base.money = modify_cost.money.data
-            #     tour_base.who_apportion = who_apportion
-            #     tour_base.update_time = datetime.datetime.now()
-            #     db.session.commit()
-            #     return redirect(url_for('home', tour_title=tour_title))
 
     else:
         all_member = [""]
@@ -524,9 +505,9 @@ def modify_item():
         modify_cost.item.data = tour_base.item
         modify_cost.money.data = tour_base.money
         insert_time = tour_base.insert_time
-        return render_template('modify_item.html', item_id=item_id, form_modify_cost=modify_cost, all_member=members,
-                               member_num=len(eval(tour_base.all_member)), who_apportion=eval(tour_base.who_apportion),
-                               insert_time=insert_time)
+        return render_template('modify_item.html', item_id=item_id, tour_title=tour_title, form_modify_cost=modify_cost,
+                               all_member=members, member_num=len(eval(tour_base.all_member)),
+                               who_apportion=eval(tour_base.who_apportion), insert_time=insert_time)
 
 
 

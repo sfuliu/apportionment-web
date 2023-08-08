@@ -366,3 +366,25 @@ body {
 .confirm-btn {
     padding: 10px 0;
 }
+
+.top {
+  --offset: 50px;
+
+  position: sticky;
+  bottom: 24px;
+
+  place-self: end;
+  margin-top: calc(100vh + var(--offset));
+
+  /* visual styling */
+  text-decoration: none;
+  padding: 10px;
+  font-family: sans-serif;
+  color: #fff;
+  background: #000;
+  border-radius: 100px;
+  white-space: nowrap;
+
+  position: fixed;
+  right: 1vw;
+}
